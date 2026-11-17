@@ -1,2 +1,95 @@
 Assignment 4 - Task 5
 Pointers to Objects and this Pointer
+#include <iomanip>
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Cart {
+    string items[10];
+    double prices[10];
+    int n = 0;
+    double discount = 0;
+
+public:
+    Cart& add(const string& item, double price) {
+        if (n < 10) {
+            items[n] = item;
+            prices[n] = price;
+            ++n;
+        }
+
+        return *this;
+    }
+
+    Cart& setDiscount(double discount) {
+        this->discount = discount;
+        return *this;
+    }
+
+    double total() const {
+        double t = 0;
+
+        for (int i = 0; i < n; ++i) {
+            t += prices[i];
+        }
+
+        return t * (100 - discount) / 100;
+    }
+};
+
+class SimpleCart {
+public:
+    double total;
+
+    SimpleCart(double t) : total(t) {}
+};
+
+int main() {
+    cout << "1. Cart and this pointer\n";
+
+    Cart c;
+    c.add("Rice", 60)
+     .add("Dal", 120)
+     .setDiscount(10);
+
+    Cart* p = &c;
+    p->add("Oil", 180);
+
+    cout << fixed << setprecision(2);
+    cout << "Cart Total: " << p->total() << '\n';
+
+    cout << "\n2. Four ways of accessing objects\n";
+
+    SimpleCart c1(100);
+    cout << c1.total << '\n';
+
+    SimpleCart* ptr = &c1;
+    cout << ptr->total << '\n';
+
+    SimpleCart& ref = c1;
+    cout << ref.total << '\n';
+
+    SimpleCart* p2 = new SimpleCart(200);
+    cout << p2->total << '\n';
+    delete p2;
+
+    cout << "\n3. Array of pointers\n";
+
+    SimpleCart a(250), b(500), d(350);
+
+    SimpleCart* carts[] = {&a, &b, &d};
+
+    int n = 3;
+    SimpleCart* highest = carts[0];
+
+    for (int i = 1; i < n; ++i) {
+        if (carts[i]->total > highest->total) {
+            highest = carts[i];
+        }
+    }
+
+    cout << "Highest total: " << highest->total << '\n';
+
+    return 0;
+}
