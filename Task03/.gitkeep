@@ -1,2 +1,103 @@
 Assignment 4 - Task 3
 Constructors and Member Classes
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Person {
+protected:
+    string name;
+    int age;
+
+public:
+    Person(const string& n, int a) : name(n), age(a) {
+        cout << "Person ";
+    }
+
+    ~Person() {
+        cout << "~Person ";
+    }
+};
+
+class Address {
+    string city;
+    int pin;
+
+public:
+    Address(const string& c, int p) : city(c), pin(p) {}
+
+    string str() const {
+        return city + "-" + to_string(pin);
+    }
+};
+
+class Student : public Person {
+    long long regNo;
+    Address home;
+
+public:
+    Student(const string& n, int a, long long r,
+            const string& c, int p)
+        : Person(n, a), regNo(r), home(c, p) {
+        cout << "Student ";
+    }
+
+    ~Student() {
+        cout << "~Student ";
+    }
+
+    void print() const {
+        cout << regNo << " " << name << " ("
+             << age << ") " << home.str() << '\n';
+    }
+};
+
+class VirtualStudent : virtual public Person {
+public:
+    VirtualStudent() : Person("Student", 20) {
+        cout << "VirtualStudent ";
+    }
+
+    ~VirtualStudent() {
+        cout << "~VirtualStudent ";
+    }
+};
+
+class VirtualStaff : virtual public Person {
+public:
+    VirtualStaff() : Person("Staff", 30) {
+        cout << "VirtualStaff ";
+    }
+
+    ~VirtualStaff() {
+        cout << "~VirtualStaff ";
+    }
+};
+
+class TeachingAssistant : public VirtualStudent, public VirtualStaff {
+public:
+    TeachingAssistant() : Person("TA", 25) {
+        cout << "TA ";
+    }
+
+    ~TeachingAssistant() {
+        cout << "~TA ";
+    }
+};
+
+int main() {
+    cout << "Student with Address:\n";
+    {
+        Student s("Kavya", 19, 192311001, "Salem", 636001);
+        s.print();
+    }
+
+    cout << "\n\nConstructor and destructor trace:\n";
+    {
+        TeachingAssistant ta;
+        cout << "| ";
+    }
+
+    cout << '\n';
+    return 0;
+}
