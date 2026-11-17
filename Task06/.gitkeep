@@ -1,2 +1,163 @@
 Assignment 4 - Task 6
 Vehicle Rental Fleet
+#include <iostream>
+#include <string>
+using namespace std;
+
+class Vehicle {
+protected:
+    string registrationNo;
+    double dailyRate;
+    bool rented;
+
+public:
+    Vehicle(string r, double rate)
+        : registrationNo(r), dailyRate(rate), rented(false) {}
+
+    virtual double charge(int days) const = 0;
+
+    virtual void display() const {
+        cout << "Registration: " << registrationNo
+             << "\nDaily Rate: " << dailyRate << '\n';
+    }
+
+    void rent() {
+        if (!rented) {
+            rented = true;
+            cout << registrationNo << " rented successfully\n";
+        } else {
+            cout << "Vehicle unavailable\n";
+        }
+    }
+
+    void returnVehicle(int days, int lateDays) {
+        if (!rented) {
+            cout << "Vehicle was not rented\n";
+            return;
+        }
+
+        double rental = charge(days);
+        double lateFee = lateDays * 200;
+
+        cout << "Rental Charge: " << rental << '\n';
+        cout << "Late Fee: " << lateFee << '\n';
+        cout << "Total: " << rental + lateFee << '\n';
+
+        rented = false;
+        cout << registrationNo << " returned successfully\n";
+    }
+
+    virtual ~Vehicle() = default;
+};
+
+class Bicycle : public Vehicle {
+public:
+    Bicycle(string r, double rate) : Vehicle(r, rate) {}
+
+    double charge(int days) const override {
+        return dailyRate * days;
+    }
+};
+
+class MotorVehicle : public Vehicle {
+protected:
+    double fuelLevel;
+    string serviceDueDate;
+
+public:
+    MotorVehicle(string r, double rate, double fuel, string date)
+        : Vehicle(r, rate), fuelLevel(fuel), serviceDueDate(date) {}
+};
+
+class TwoWheeler : public MotorVehicle {
+public:
+    TwoWheeler(string r, double rate, double fuel, string date)
+        : MotorVehicle(r, rate, fuel, date) {}
+
+    double charge(int days) const override {
+        return dailyRate * days + 50;
+    }
+};
+
+class Car : public MotorVehicle {
+protected:
+    int seatingCapacity;
+
+public:
+    Car(string r, double rate, double fuel, string date, int seats)
+        : MotorVehicle(r, rate, fuel, date),
+          seatingCapacity(seats) {}
+
+    double charge(int days) const override {
+        return dailyRate * days + 200;
+    }
+};
+
+class ElectricCar : public Car {
+    double batteryCapacity;
+    double electricityRate;
+
+public:
+    ElectricCar(string r, double rate, double battery, double kwhRate)
+        : Car(r, rate, 0, "Not applicable", 5),
+          batteryCapacity(battery),
+          electricityRate(kwhRate) {}
+
+    double charge(int days) const override {
+        return dailyRate * days + batteryCapacity * electricityRate;
+    }
+};
+
+class ElectricBus : public MotorVehicle {
+    double batteryCapacity;
+    double electricityRate;
+
+public:
+    ElectricBus(string r, double rate, double battery, double kwhRate)
+        : MotorVehicle(r, rate, 0, "Not applicable"),
+          batteryCapacity(battery),
+          electricityRate(kwhRate) {}
+
+    double charge(int days) const override {
+        return dailyRate * days + batteryCapacity * electricityRate;
+    }
+};
+
+int main() {
+    Bicycle bicycle("BIKE101", 100);
+    TwoWheeler twoWheeler("BIKE202", 200, 5, "2027-01-01");
+    Car car("CAR303", 1000, 20, "2027-02-01", 5);
+    ElectricCar electricCar("EV404", 1500, 50, 8);
+    ElectricBus electricBus("BUS505", 3000, 200, 8);
+
+    Vehicle* fleet[] = {
+        &bicycle,
+        &twoWheeler,
+        &car,
+        &electricCar,
+        &electricBus
+    };
+
+    const int count = 5;
+
+    cout << "VEHICLE RENTAL SYSTEM\n\n";
+
+    for (int i = 0; i < count; ++i) {
+        fleet[i]->display();
+    }
+
+    cout << "\nRENTING VEHICLES\n";
+
+    for (int i = 0; i < count; ++i) {
+        fleet[i]->rent();
+    }
+
+    cout << "\nRETURNING VEHICLES\n";
+
+    for (int i = 0; i < count; ++i) {
+        fleet[i]->returnVehicle(2, 1);
+        cout << '\n';
+    }
+
+    return 0;
+}
